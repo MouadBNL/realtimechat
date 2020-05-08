@@ -20,6 +20,6 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
-Route::get('/chat', 'ChatController@index')->name('chat');
-Route::get('/chat/api/fetch', 'ChatController@fetchAllMessages')->name('chat.fetch');
-Route::get('/chat/api/store', 'ChatController@store')->name('chat.store');
+Route::get('/chat', 'MessageController@index')->name('chat');
+Route::get('/chat/api/fetch', 'MessageController@fetchAllMessages')->name('chat.fetch');
+Route::get('/chat/api/store', 'MessageController@store')->name('chat.store');
