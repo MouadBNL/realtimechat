@@ -5,7 +5,7 @@
         </div>
         <div>
             <p class="border-bottom p-2 m-0" v-for="user in users" :key="user.id">
-                {{ user }}
+                {{ user.name }}
             </p>
         </div>
     </div>

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Message;
+use App\Events\MessageSent;
+use App\Events\ChatEvent;
 use Illuminate\Http\Request;
 
 class MessageController extends Controller
@@ -30,7 +32,14 @@ class MessageController extends Controller
      */
     public function fetchAllMessages()
     {
-    	return Chat::with('user')->get();
+        $messages = [];
+        foreach (Message::with('user')->get() as $m) {
+            array_push($messages, [
+                'user' => $m->user->name,
+                'content' => $m->content,
+            ]);
+        }
+    	return json_encode($messages);
     }
 
     /**
@@ -48,9 +57,13 @@ class MessageController extends Controller
         $msg = auth()->user()->messages()->create([
             'content' => $data['content']
         ]);
-        
-        broadcast(new MessageSent($msg->content, auth()->user()->name));
 
-        return ['status' => 'success'];
+        broadcast(new MessageSent($data['content'], auth()->user()->name))->toOthers();;
+        //broadcast(new ChatEvent($msg->load('user')))->toOthers();
+
+        return [
+            'content' => $msg->content,
+            'user' => auth()->user()->name,
+        ];
     }
 }

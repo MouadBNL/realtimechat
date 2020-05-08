@@ -14,6 +14,7 @@ class Message extends Model
     protected $fillable = [
         'content',
     ];
+    protected $guarded = [];
 
     public function user()
     {
