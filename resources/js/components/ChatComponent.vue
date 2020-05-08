@@ -3,7 +3,7 @@
         <div class="row bg-white shadow rounded chat-component border p-0">
             <div class="col-md-9 p-0 border-right">
                 <MessageLog class="message-log p-2" :messages="messages"></MessageLog>
-                <MessageComposer class="message-composer border-top" id="scrolldiv" v-on:sendmessage="addMessage"></MessageComposer>
+                <MessageComposer class="message-composer border-top" v-chat-scroll v-on:sendmessage="addMessage"></MessageComposer>
             </div>
             <div class="col-md-3  p-0">
                 <OnlineUsers :users="connectedusers"></OnlineUsers>
@@ -45,8 +45,6 @@ export default {
                 this.messages = response.data;
             });
         
-        var objDiv = document.getElementById("scrolldiv");
-        objDiv.scrollTop = objDiv.scrollHeight;
         Echo.join('chatroom')
             .here(users => {
                 this.connectedusers = users
@@ -60,7 +58,6 @@ export default {
             })
             .listen('MessageSent', (e) => {
                 this.messages.push(e)
-                objDiv.scrollTop = objDiv.scrollHeight;
             })
     },
 }
