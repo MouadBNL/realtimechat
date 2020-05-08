@@ -1927,6 +1927,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
 
 
 
@@ -1952,6 +1957,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       }).then(function (response) {
         _this.messages.push(response.data);
       });
+    },
+    sendTypingEvent: function sendTypingEvent() {
+      Echo.join('chatroom').whisper('typing', this.user);
     }
   },
   created: function created() {
@@ -1961,16 +1969,30 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       _this2.messages = response.data;
     });
     Echo.join('chatroom').here(function (users) {
+      users.forEach(function (u) {
+        u.istyping = false;
+      });
+      console.log(users);
       _this2.connectedusers = users;
     }).joining(function (user) {
+      user.istyping = false;
+
       _this2.connectedusers.push(user);
     }).leaving(function (user) {
       _this2.connectedusers = _this2.connectedusers.filter(function (u) {
         return u.id != user.id;
       });
-      console.log(user);
     }).listen('MessageSent', function (e) {
       _this2.messages.push(e);
+    }).listenForWhisper('typing', function (user) {
+      _this2.connectedusers.forEach(function (u) {
+        if (user.id == u.id) {
+          u.istyping = true;
+          setTimeout(function () {
+            u.istyping = false;
+          }, 3000);
+        }
+      });
     });
   }
 });
@@ -1986,6 +2008,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -2015,6 +2043,9 @@ __webpack_require__.r(__webpack_exports__);
       } else {
         this.inputClasses.push('is-invalid');
       }
+    },
+    sendTypingEvent: function sendTypingEvent() {
+      this.$emit('sendTypingEvent');
     }
   }
 });
@@ -6616,7 +6647,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.chat-component[data-v-80d584ac]{\r\n    max-height: 500px;\n}\n.message-log[data-v-80d584ac]{\r\n    height: 405px;\r\n    overflow-y: scroll;\r\n    background: rgb(250, 250, 250);\n}\r\n", ""]);
+exports.push([module.i, "\n.message-log[data-v-80d584ac]{\r\n    background: rgb(250, 250, 250);\n}\r\n", ""]);
 
 // exports
 
@@ -43979,7 +44010,10 @@ var render = function() {
             _c("MessageComposer", {
               directives: [{ name: "chat-scroll", rawName: "v-chat-scroll" }],
               staticClass: "message-composer border-top",
-              on: { sendmessage: _vm.addMessage }
+              on: {
+                sendmessage: _vm.addMessage,
+                sendTypingEvent: _vm.sendTypingEvent
+              }
             })
           ],
           1
@@ -44032,15 +44066,18 @@ var render = function() {
         attrs: { type: "text" },
         domProps: { value: _vm.messageContent },
         on: {
-          keydown: function($event) {
-            if (
-              !$event.type.indexOf("key") &&
-              _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
-            ) {
-              return null
-            }
-            return _vm.sendMessage($event)
-          },
+          keydown: [
+            function($event) {
+              if (
+                !$event.type.indexOf("key") &&
+                _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
+              ) {
+                return null
+              }
+              return _vm.sendMessage($event)
+            },
+            _vm.sendTypingEvent
+          ],
           input: function($event) {
             if ($event.target.composing) {
               return
@@ -44130,7 +44167,12 @@ var render = function() {
       "div",
       _vm._l(_vm.users, function(user) {
         return _c("p", { key: user.id, staticClass: "border-bottom p-2 m-0" }, [
-          _vm._v("\n            " + _vm._s(user.name) + "\n        ")
+          _vm._v("\n            " + _vm._s(user.name) + " "),
+          user.istyping
+            ? _c("span", { staticClass: "badge badge-secondary" }, [
+                _vm._v("typing..")
+              ])
+            : _vm._e()
         ])
       }),
       0

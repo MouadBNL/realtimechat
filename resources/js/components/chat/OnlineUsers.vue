@@ -5,7 +5,7 @@
         </div>
         <div>
             <p class="border-bottom p-2 m-0" v-for="user in users" :key="user.id">
-                {{ user.name }}
+                {{ user.name }} <span v-if="user.istyping" class="badge badge-secondary">typing..</span>
             </p>
         </div>
     </div>

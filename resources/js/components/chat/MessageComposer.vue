@@ -1,7 +1,13 @@
 <template>
     <div class="row col-12 p-0 m-0">
         <div class="col-10">
-            <input :class="inputClasses" v-model="messageContent" type="text" @keydown.enter="sendMessage"/>
+            <input
+                :class="inputClasses"
+                v-model="messageContent"
+                type="text"
+                @keydown.enter="sendMessage"
+                @keydown="sendTypingEvent"
+            />
         </div>
         <div class="col-2 p-0">
             <button class="btn col-12 btn-primary" @click="sendMessage">Send</button>
@@ -29,6 +35,9 @@ export default {
             else{
                 this.inputClasses.push('is-invalid');
             }
+        },
+        sendTypingEvent(){
+            this.$emit('sendTypingEvent');
         }
     },
 }

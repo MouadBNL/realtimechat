@@ -58,8 +58,7 @@ class MessageController extends Controller
             'content' => $data['content']
         ]);
 
-        broadcast(new MessageSent($data['content'], auth()->user()->name))->toOthers();;
-        //broadcast(new ChatEvent($msg->load('user')))->toOthers();
+        broadcast(new MessageSent($data['content'], auth()->user()->name))->toOthers();
 
         return [
             'content' => $msg->content,
